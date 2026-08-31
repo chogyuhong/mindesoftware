@@ -487,7 +487,7 @@
       <a href="#results">실적</a>
       <a href="#transfer">양도안내</a>
     </nav>
-    <a href="mailto:biz@mindsoftware.io" class="nav-cta">양도 문의</a>
+    <a href="mailto:biz@mindsoftware.io" class="nav-cta" onclick="copyEmail()">양도 문의</a>
   </div>
 </header>
 
@@ -887,7 +887,7 @@
 
       <div class="transfer-cta" data-reveal>
         <p>양도 범위, 자산 목록, 가격 조건에 대해 편하게 문의해 주세요. 비밀 유지 하에 상담을 진행합니다.</p>
-        <a href="mailto:biz@mindsoftware.io" class="btn-primary">양도 조건 문의하기</a>
+        <a href="mailto:biz@mindsoftware.io" class="btn-primary" onclick="copyEmail()">양도 조건 문의하기</a>
       </div>
     </div>
   </section>
@@ -899,7 +899,7 @@
       <h2 style="margin-top:16px;">지금, 이 플랫폼의 양도를 문의하세요.</h2>
       <p>두유애드가 개발한 탈쿠키 리타게팅 플랫폼의 소스코드와 기술을, 현재 보유사인 마인드소프트랩을 통해 양도합니다. 양도 범위와 조건에 대해 편하게 문의해 주세요.</p>
       <div class="cta-actions">
-        <a href="mailto:biz@mindsoftware.io" class="btn-primary">양도 문의하기</a>
+        <a href="mailto:biz@mindsoftware.io" class="btn-primary" onclick="copyEmail()">양도 문의하기</a>
         <a href="#transfer" class="btn-ghost">양도 자산 다시 보기</a>
       </div>
     </div>
@@ -994,6 +994,43 @@
     }, {threshold:0.4});
     bars.forEach(b=>io.observe(b));
   })();
+
+// 문의 버튼: mailto 는 그대로 두고, 클릭 순간 이메일을 클립보드에도 복사한다.
+// 메일 앱/핸들러가 설정되지 않은 PC 에서는 mailto 가 조용히 실패하므로 복사가 보완재 역할을 한다.
+function copyEmail() {
+  var email = 'biz@mindsoftware.io';
+  function toast() {
+    var el = document.getElementById('copy-toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'copy-toast';
+      el.style.cssText = 'position:fixed;left:50%;bottom:48px;transform:translateX(-50%);'
+        + 'background:#111827;color:#fff;padding:14px 22px;border-radius:10px;'
+        + 'font-size:15px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.35);'
+        + 'opacity:0;transition:opacity .25s;';
+      document.body.appendChild(el);
+    }
+    el.textContent = '\uD83D\uDCCB ' + email + ' \uBCF5\uC0AC \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.';
+    requestAnimationFrame(function(){ el.style.opacity = '1'; });
+    clearTimeout(el._t);
+    el._t = setTimeout(function(){ el.style.opacity = '0'; }, 2600);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(email).then(toast).catch(function(){ fallbackCopy(email, toast); });
+  } else {
+    fallbackCopy(email, toast);
+  }
+}
+// 구형 브라우저/비보안 컨텍스트용 폴백
+function fallbackCopy(text, done) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); done(); } catch (e) {}
+  document.body.removeChild(ta);
+}
 </script>
 
 </body>
